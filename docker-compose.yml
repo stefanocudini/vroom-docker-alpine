@@ -1,0 +1,37 @@
+version: '3'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  vroom:
+    container_name: vroom-alpine
+    image: vroom-alpine:v1.10.0
+    build:
+      context: ./
+      args:
+        VROOM_RELEASE: v1.10.0
+    # volumes:
+    #   - ./vroom-conf/:/conf
+    # environment:
+    #   - VROOM_ROUTER=ors  # router to use, osrm, valhalla or ors
+    # depends_on:
+    #   - ors
+  # EXAMPLE for OpenRouteService, please consult the repo for details: https://github.com/GIScience/openrouteservice
+#  ors:
+#    container_name: ors
+#    ports:
+#      - 8080:8080
+#    image: openrouteservice/openrouteservice:latest
+#    volumes:
+#      - ./graphs:/ors-core/data/graphs
+#      - ./elevation_cache:/ors-core/data/elevation_cache
+#      - ./logs/ors:/var/log/ors
+#      - ./logs/tomcat:/usr/local/tomcat/logs
+#      - ./conf:/ors-conf
+#      - ./path/to/pbf:/ors-core/data/osm_file.pbf  # alter path to your local OSM PBF file, e.g. from https://download.geofabrik.de
+#    environment:
+#      - BUILD_GRAPHS=False  # Forces the container to rebuild the graphs, e.g. when PBF is changed in app.config
+#      - "JAVA_OPTS=-Djava.awt.headless=true -server -XX:TargetSurvivorRatio=75 -XX:SurvivorRatio=64 -XX:MaxTenuringThreshold=3 -XX:+UseG1GC -XX:+ScavengeBeforeFullGC -XX:ParallelGCThreads=4 -Xms1g -Xmx2g"
+#      - "CATALINA_OPTS=-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.rmi.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost"

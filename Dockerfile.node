@@ -1,0 +1,33 @@
+FROM europe-west4-docker.pkg.dev/openmove-1475230942894/images/node:v14.17.3-6.14.13-alpine3.14 AS builder
+RUN apk add --no-cache \
+  git \
+  postgresql-dev \
+  python3 \
+  make \
+  g++ \
+  openssl-dev \
+  asio-dev \
+  bash
+WORKDIR /home/logic
+ADD src src
+ADD vroom vroom
+RUN mkdir -p _run
+ADD .npmrc index.js _conf.js package.json ./
+RUN npm install --only=prod
+RUN npm run vroom-download
+RUN rm -Rfv .npmrc
+RUN find _run -maxdepth 1 ! \
+  \( \
+    -name "_run" -o \
+    -name "vroom" \
+  \) \
+  -exec rm -Rf {} + || true
+RUN chmod u+x /home/logic/_run/vroom
+
+FROM europe-west4-docker.pkg.dev/openmove-1475230942894/images/node:v14.17.3-6.14.13-alpine3.14 AS runner
+RUN apk add --no-cache \
+  postgresql-dev \
+  bash
+WORKDIR /home
+COPY --from=builder /home/logic .
+CMD ["node", "index.js"]

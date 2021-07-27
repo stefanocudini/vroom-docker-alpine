@@ -21,6 +21,10 @@ RUN echo "Cloning and installing vroom release ${VROOM_RELEASE}..." && \
     make -C /vroom/src -j$(nproc) && \
     cd /
 
+RUN apk info -L glpk-dev
+
+RUN ls -l /usr/lib
+
 # # TODO: change to release version again
 #ARG VROOM_EXPRESS_RELEASE=v0.9.0
 # RUN echo "Cloning and installing vroom-express release ${VROOM_EXPRESS_RELEASE}..." && \
@@ -28,19 +32,25 @@ RUN echo "Cloning and installing vroom release ${VROOM_RELEASE}..." && \
 #     cd vroom-express && \
 #     git fetch --tags && \
 #     git checkout $VROOM_EXPRESS_RELEASE
+#WORKDIR /vroom-express
 
 FROM node:14.17.3-alpine3.14 as runstage
 RUN apk add --no-cache \
   bash \
   jq
 
+WORKDIR /
+
 # COPY --from=builder /vroom-express/. /vroom-express
 COPY --from=builder /vroom/bin/vroom /usr/local/bin
+COPY --from=builder /usr/lib/* /usr/lib/
 
-COPY ./tests .
-COPY ./test.sh .
+COPY ./tests /tests
+COPY ./test.sh . 
 
-#WORKDIR /vroom-express
+RUN ls -l /tests
+RUN ls -lrt /usr/lib/
+
 
 # RUN apt-get update > /dev/null && \
 #     apt-get install -y --no-install-recommends \
